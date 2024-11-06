@@ -81,7 +81,10 @@ ${commentsContent}
         labels: repoLabels?.map(label => ({ id: label.id, text: label.name, description: label.description }))
     };
 
-    return await callAPI(`http://localhost:5001/bot/${orgId}/${botId}/responder/github`,
+    const basePath = 'https://335k3gia6uavyfimzvao2l6fzy0wuajw.lambda-url.ap-south-1.on.aws';
+    //const basePath = 'http://localhost:5001';
+
+    return await callAPI(`${basePath}/bot/${orgId}/${botId}/responder/github`,
         { headers: { 'Content-Type': 'application/json' }, method: 'POST', body: requestBody });
 }
 
