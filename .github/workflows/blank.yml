@@ -1,0 +1,52 @@
+name: Issue Responder
+
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Check if comment is from bot user
+        run: |
+          if [[ "${{ github.actor }}" == "github-actions[bot]" ]]; then
+            echo "Comment was made by the GitHub Actions bot. Exiting without running the script."
+            exit 0
+          fi
+
+      - name: Retrieve collaborators
+        id: get-collaborators
+        run: |
+          collaborators=$(curl -s -H "Authorization: token ${{ github.token }}" \
+            "https://api.github.com/repos/${{ github.repository }}/collaborators" | \
+            jq -r '.[].login')
+          echo "${collaborators}" > collaborators.txt
+
+      - name: Check if comment is from collaborator
+        run: |
+          COMMENT_USER="${{ github.actor }}"
+          if grep -q "$COMMENT_USER" collaborators.txt; then
+            echo "Comment was made by a collaborator. Exiting without running the script."
+            exit 0
+          fi
+
+      - name: Download script
+        run: |
+          curl -o script.js PLACEHOLDER_URL
+          # Replace PLACEHOLDER_URL with the actual URL of your Node.js script
+
+      - name: Execute script
+        run: |
+          node script.js --ticket "${{ github.event.issue.number }}" \
+                          --repo "${{ github.repository }}" \
+                          --ghToken "${{ github.token }}" \
+                          --orgId "6727929f6d4e0f57f51f42de" \
+                          --botId "67279ae39c3e548d6f7263f0"
