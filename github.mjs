@@ -1,20 +1,32 @@
 
-const { ticket: issueKey, repo, ghToken, orgId, botId } = getCmdArguments();
+const args = getCmdArguments();
+console.log("Argument received:", args);
 
+const { ticket: issueKey, repo, ghToken, orgId, botId } = args;
 const padNumber = (number) => number.toString().padStart(5, '0');
 
 await (async function () {
     try {
         const issueDetails = await gitFetch(`https://api.github.com/repos/${repo}/issues/${issueKey}`);
+        console.log("Done fetching issue details");
+
         const comments = issueDetails.comments ? await gitFetch(issueDetails.comments_url) : [];
+        console.log("Done fetching issue comments");
+
         const repoLabels = await gitFetch(`https://api.github.com/repos/${repo}/labels`);
+        console.log("Done fetching repo labels");
+
         const apiResponse = await callResponder(issueDetails, comments, repoLabels);
+        console.log("Done getting response from bot");
+
         if (apiResponse.completionCost) {
             console.log("Cost incurred for processing this ticket", apiResponse.completionCost);
         }
+
         await updateGitHubIssue(issueDetails, apiResponse);
+        console.log("Done with updating ticket");
     } catch (error) {
-        console.error(`Error: ${error.message}`);
+        console.error(`Error: ${error.message}`, error);
     }
 })();
 
@@ -37,6 +49,7 @@ async function callAPI(url, options) {
     if (options?.body && typeof options.body === 'object') {
         options.body = JSON.stringify(options.body);
     }
+    console.log('About to hit url: ', url);
     const response = await fetch(url, options);
     if (!response.ok) throw new Error(`Error calling API:`, url, response.statusText);
     return await response.json();
