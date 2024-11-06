@@ -30,13 +30,13 @@ jobs:
             jq -r '.[].login')
           echo "${collaborators}" > collaborators.txt
 
-      - name: Check if comment is from collaborator
-        run: |
-          COMMENT_USER="${{ github.actor }}"
-          if grep -q "$COMMENT_USER" collaborators.txt; then
-            echo "Comment was made by a collaborator. Exiting without running the script."
-            exit 0
-          fi
+      #- name: Check if comment is from collaborator
+      #  run: |
+      #    COMMENT_USER="${{ github.actor }}"
+      #    if grep -q "$COMMENT_USER" collaborators.txt; then
+      #      echo "Comment was made by a collaborator. Exiting without running the script."
+      #      exit 0
+      #    fi
 
       - name: Download script
         run: |
