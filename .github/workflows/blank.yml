@@ -40,12 +40,11 @@ jobs:
 
       - name: Download script
         run: |
-          curl -o script.js PLACEHOLDER_URL
-          # Replace PLACEHOLDER_URL with the actual URL of your Node.js script
+          curl -o github.mjs https://raw.githubusercontent.com/shridhar-tl/test-repo/refs/heads/main/github.mjs
 
       - name: Execute script
         run: |
-          node script.js --ticket "${{ github.event.issue.number }}" \
+          node github.mjs --ticket "${{ github.event.issue.number }}" \
                           --repo "${{ github.repository }}" \
                           --ghToken "${{ github.token }}" \
                           --orgId "6727929f6d4e0f57f51f42de" \
