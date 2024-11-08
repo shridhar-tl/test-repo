@@ -10,17 +10,21 @@ jobs:
   run-script:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '20'
-
       - name: Check if comment is from bot user
         run: |
           if [[ "${{ github.actor }}" == "github-actions[bot]" ]]; then
             echo "Comment was made by the GitHub Actions bot. Exiting without running the script."
             exit 0
           fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Download script
+        run: |
+          curl -o github.mjs https://bot.jiraassistant.com/actions/github/github.mjs
 
       - name: Retrieve collaborators
         id: get-collaborators
@@ -30,22 +34,26 @@ jobs:
             jq -r '.[].login')
           echo "${collaborators}" > collaborators.txt
 
-      #- name: Check if comment is from collaborator
-      #  run: |
-      #    COMMENT_USER="${{ github.actor }}"
-      #    if grep -q "$COMMENT_USER" collaborators.txt; then
-      #      echo "Comment was made by a collaborator. Exiting without running the script."
-      #      exit 0
-      #    fi
-
-      - name: Download script
+      - name: Check if comment is from collaborator
         run: |
-          curl -o github.mjs https://raw.githubusercontent.com/shridhar-tl/test-repo/refs/heads/main/github.mjs
+          COMMENT_USER="${{ github.actor }}"
+          if grep -q "$COMMENT_USER" collaborators.txt; then
+            echo "Comment was made by a collaborator."
+            node github.mjs --ticket "${{ github.event.issue.number }}" \
+                  --repo "${{ github.repository }}" \
+                  --orgId "${{ env.RESPONDER_ORG_ID }}" \
+                  --botId "${{ env.RESPONDER_BOT_ID }}" \
+                  --ghToken "${{ github.token }}" \
+                  --authToken "${{ secrets.RESPONDER_TOKEN }}" \
+                  --updateOnly
+            #exit 0
+          fi
 
       - name: Execute script
         run: |
           node github.mjs --ticket "${{ github.event.issue.number }}" \
-                          --repo "${{ github.repository }}" \
-                          --ghToken "${{ github.token }}" \
-                          --orgId "6727929f6d4e0f57f51f42de" \
-                          --botId "67279ae39c3e548d6f7263f0"
+                  --repo "${{ github.repository }}" \
+                  --orgId "${{ env.RESPONDER_ORG_ID }}" \
+                  --botId "${{ env.RESPONDER_BOT_ID }}" \
+                  --ghToken "${{ github.token }}" \
+                  --authToken "${{ secrets.RESPONDER_TOKEN }}"
