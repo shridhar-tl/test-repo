@@ -41,8 +41,8 @@ jobs:
             echo "Comment was made by a collaborator."
             node github.mjs --ticket "${{ github.event.issue.number }}" \
                   --repo "${{ github.repository }}" \
-                  --orgId "${{ env.RESPONDER_ORG_ID }}" \
-                  --botId "${{ env.RESPONDER_BOT_ID }}" \
+                  --orgId "${{ vars.RESPONDER_ORG_ID }}" \
+                  --botId "${{ vars.RESPONDER_BOT_ID }}" \
                   --ghToken "${{ github.token }}" \
                   --authToken "${{ secrets.RESPONDER_TOKEN }}" \
                   --updateOnly
@@ -53,7 +53,7 @@ jobs:
         run: |
           node github.mjs --ticket "${{ github.event.issue.number }}" \
                   --repo "${{ github.repository }}" \
-                  --orgId "${{ env.RESPONDER_ORG_ID }}" \
-                  --botId "${{ env.RESPONDER_BOT_ID }}" \
+                  --orgId "${{ vars.RESPONDER_ORG_ID }}" \
+                  --botId "${{ vars.RESPONDER_BOT_ID }}" \
                   --ghToken "${{ github.token }}" \
                   --authToken "${{ secrets.RESPONDER_TOKEN }}"
