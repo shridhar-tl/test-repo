@@ -5,6 +5,11 @@ on:
     types: [opened]
   issue_comment:
     types: [created]
+    
+permissions:
+  issues: write
+  discussions: write
+  statuses: write
 
 jobs:
   run-script:
