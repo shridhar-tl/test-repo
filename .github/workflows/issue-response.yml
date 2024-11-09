@@ -38,11 +38,15 @@ jobs:
       - name: Identify Action
         run: |
           if [[ "${{ github.event_name }}" == "discussion_comment" ]] || [[ "${{ github.event_name }}" == "discussion" ]]; then
-            TICKET_TYPE="discussion"
+            echo "inside discussion"
+            TICKET_TYPE="discussions"
             TICKET_NUMBER="${{ github.event.discussion.number }}"
+            echo "IssueType=$TICKET_TYPE; TicketNo:$TICKET_NUMBER"
           else
-            TICKET_TYPE="issue"
+            echo "inside issues"
+            TICKET_TYPE="issues"
             TICKET_NUMBER="${{ github.event.issue.number }}"
+            echo "IssueType=$TICKET_TYPE; TicketNo:$TICKET_NUMBER"
           fi
 
       - name: Retrieve collaborators
